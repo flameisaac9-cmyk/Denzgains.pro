@@ -1,0 +1,24 @@
+name = "denzgains-pro-api"
+
+main = "workers.js"
+
+compatibility_date = "2026-08-11"
+
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "denzgains-pro"
+database_id = "YOUR_DATABASE_ID"
+
+[vars]
+PESAPAL_ENV = "sandbox"
+FRONTEND_URL = "https://YOUR-FRONTEND-DOMAIN.com"
+CURRENCY_DEFAULT = "KES"
+
+[secrets]
+required = [
+  "PESAPAL_CONSUMER_KEY",
+  "PESAPAL_CONSUMER_SECRET",
+  "PESAPAL_IPN_ID"
+]

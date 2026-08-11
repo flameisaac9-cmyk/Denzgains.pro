@@ -1,0 +1,117 @@
+// DenzGains Pro - Core App & Interactive SMM Engine
+let currentCurrency = 'KES'; // Default KES for Kenya
+
+// Global Currency Formatter
+function formatPrice(amountUSD, currency = currentCurrency) {
+  const symbol = EXCHANGE_RATES[currency].symbol;
+  const rate = EXCHANGE_RATES[currency].rate;
+  const val = amountUSD * rate;
+  
+  if (currency === 'KES') {
+    return `${symbol}${val.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  return `${symbol}${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+// Initialize on DOM Ready
+document.addEventListener('DOMContentLoaded', () => {
+  initCurrencySwitcher();
+  initCalculatorWidget();
+  initWelcomeModal();
+  initFAQAccordion();
+  initAffiliateCalculator();
+  initServicesTable();
+  initOrderTracker();
+  initMPesaPaymentModal();
+  initQuickOrderModal();
+});
+
+// 1. CURRENCY SWITCHER
+function initCurrencySwitcher() {
+  const switchers = document.querySelectorAll('.currency-selector');
+  switchers.forEach(select => {
+    select.value = currentCurrency;
+    select.addEventListener('change', (e) => {
+      currentCurrency = e.target.value;
+      // Sync other dropdowns if any
+      switchers.forEach(s => s.value = currentCurrency);
+      
+      // Update UI elements
+      updateAllPrices();
+    });
+  });
+}
+
+function updateAllPrices() {
+  // Update calculator
+  updateCalculatorDisplay();
+  // Update services table if present
+  renderServicesTable();
+  // Update affiliate calculator
+  updateAffiliateCalculator();
+  
+  // Custom toast notification
+  showToast(`Currency changed to ${currentCurrency}`);
+}
+
+// 2. LIVE INTERACTIVE CALCULATOR ON HERO / LANDING PAGE
+let selectedPlatform = 'instagram';
+let selectedServiceObj = null;
+
+function initCalculatorWidget() {
+  const tabs = document.querySelectorAll('.platform-tab');
+  const serviceSelect = document.getElementById('calc-service-select');
+  const quantitySlider = document.getElementById('calc-quantity-slider');
+  const quantityInput = document.getElementById('calc-quantity-input');
+  const linkInput = document.getElementById('calc-link-input');
+  const quickOrderBtn = document.getElementById('btn-calc-order');
+
+  if (!serviceSelect || !quantitySlider) return;
+
+  // Tab click handler
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      selectedPlatform = tab.getAttribute('data-platform');
+      populateServiceDropdown(selectedPlatform);
+    });
+  });
+
+  // Populate services for platform
+  function populateServiceDropdown(platform) {
+    const filtered = SERVICES_DATA.filter(s => s.platform === platform);
+    serviceSelect.innerHTML = '';
+    filtered.forEach((srv, index) => {
+      const option = document.createElement('option');
+      option.value = srv.id;
+      option.textContent = `${srv.name} — ${formatPrice(srv.priceUSD)} / 1K`;
+      serviceSelect.appendChild(option);
+      if (index === 0) selectedServiceObj = srv;
+    });
+    updateSliderLimits();
+    updateCalculatorDisplay();
+  }
+
+  // When service dropdown changes
+  serviceSelect.addEventListener('change', () => {
+    const id = parseInt(serviceSelect.value);
+    selectedServiceObj = SERVICES_DATA.find(s => s.id === id);
+    updateSliderLimits();
+    updateCalculatorDisplay();
+  });
+
+  function updateSliderLimits() {
+    if (!selectedServiceObj) return;
+    quantitySlider.min = selectedServiceObj.min;
+    quantitySlider.max = selectedServiceObj.max;
+    // Default to a sensible starting amount
+    const defaultVal = Math.min(Math.max(selectedServiceObj.min * 5, 1000), selectedServiceObj.max);
+    quantitySlider.value = defaultVal;
+    if (quantityInput) quantityInput.value = defaultVal;
+    
+    // Update min/max text labels
+    const minLbl = document.getElementById('lbl-min-qty');
+    const maxLbl = document.getElementById('lbl-max-qty');
+    if (minLbl) minLbl.textContent = `Min: ${selectedServiceObj.min.toLocaleString()}`;
+    if (maxLbl) maxLbl.textContent = `Max: ${selectedServiceObj.max.toLocaleString()}`;

@@ -1,0 +1,13 @@
+name = "denzgains-com-pro"
+main = "workers.js"
+compatibility_date = "2026-08-10"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "denzgains-db"
+database_id = "PASTE_DATABASE_ID_HERE"
+
+[vars]
+PESAPAL_ENV = "sandbox"
+APP_BASE_URL = "https://denzgains-com-pro.borrose607.workers.dev"
+CURRENCY_DEFAULT = "KES"

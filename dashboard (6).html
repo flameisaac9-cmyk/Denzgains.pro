@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Dashboard — DenzGains Pro SMM Panel</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyan: {
+              400: '#00f2fe',
+              500: '#00d4df',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen flex flex-col bg-[#080b11] text-gray-100">
+
+  <!-- TOP NAVBAR -->
+  <header class="glass-nav border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-8">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-black text-xl">
+            ⚡
+          </div>
+          <span class="text-xl font-extrabold tracking-tight text-white">DENZ<span class="text-gradient-cyan">GAINS</span></span>
+        </a>
+
+        <div class="hidden md:flex items-center gap-2 bg-[#111827] p-1 rounded-xl border border-gray-800 text-sm font-semibold">
+          <button class="dash-tab-btn active px-4 py-2 rounded-lg bg-cyan-500 text-black font-bold transition-all" data-target="tab-new-order">
+            🛒 New Order
+          </button>
+          <button class="dash-tab-btn px-4 py-2 rounded-lg text-gray-300 hover:text-white transition-all" data-target="tab-orders">
+            📦 Orders & History
+          </button>
+          <button class="dash-tab-btn px-4 py-2 rounded-lg text-gray-300 hover:text-white transition-all" data-target="tab-deposit">
+            💰 Add Funds [M-Pesa]
+          </button>
+          <button class="dash-tab-btn px-4 py-2 rounded-lg text-gray-300 hover:text-white transition-all" data-target="tab-affiliate">
+            💎 12% Affiliate
+          </button>
+          <button class="dash-tab-btn px-4 py-2 rounded-lg text-gray-300 hover:text-white transition-all" data-target="tab-api">
+            🔌 Reseller API
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <!-- Currency -->
+        <select class="currency-selector bg-[#111827] border border-gray-700 text-cyan-400 text-xs font-bold font-mono py-2 px-3 rounded-xl focus:outline-none focus:border-cyan-400">
+          <option value="KES">🇰🇪 KES (KSh)</option>
+          <option value="USD">🇺🇸 USD ($)</option>
+          <option value="EUR">🇪🇺 EUR (€)</option>
+        </select>
+
+        <!-- Balance Badge -->
+        <div class="bg-[#111827] border border-green-500/40 rounded-xl py-2 px-4 flex items-center gap-3">
+          <div class="text-xs text-gray-400 font-mono">BALANCE:</div>
+          <div id="dash-balance-display" class="font-mono font-extrabold text-green-400 text-sm">KSh 2,450.00</div>
+          <button class="bg-green-500/20 hover:bg-green-500/30 text-green-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-green-500/30 transition-colors" onclick="switchDashTab('tab-deposit')">
+            + Top Up
+          </button>
+        </div>
+
+        <!-- Back to site -->
+        <a href="index.html" class="hidden sm:flex items-center gap-1.5 text-xs text-gray-400 hover:text-white">
+          <span>&larr; Back to Site</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- DASHBOARD MAIN CONTENT -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- WELCOME BANNER IN DASHBOARD -->
+    <div class="bg-gradient-to-r from-[#111827] via-[#162036] to-[#111827] border border-cyan-500/30 rounded-2xl p-6 sm:p-8 mb-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="bg-cyan-500/20 text-cyan-400 text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border border-cyan-500/40">VIP CLIENT</span>
+          <span class="text-xs text-gray-400 font-mono">ACCOUNT STATUS: ACTIVE</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Welcome Back, DenzGains Client!</h1>
+        <p class="text-gray-300 text-sm mt-1">
+          Your orders are processing automatically. Need fast M-Pesa STK push topup? Click "Add Funds" anytime.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 bg-[#0a0e17]/80 border border-gray-800 p-4 rounded-xl font-mono text-center min-w-[300px]">
+        <div>
+          <span class="text-xs text-gray-400 block">TOTAL SPENT</span>
+          <span id="stat-total-spent" class="text-white font-bold">KSh 14,820</span>
+        </div>
+        <div class="border-x border-gray-800">
+          <span class="text-xs text-gray-400 block">ORDERS</span>
+          <span class="text-cyan-400 font-bold">42</span>
+        </div>
+        <div>
+          <span class="text-xs text-gray-400 block">DISCOUNT</span>
+          <span class="text-green-400 font-bold">5% VIP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: NEW ORDER -->
+    <div id="tab-new-order" class="dash-tab-content">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left order form (8 cols) -->
+        <div class="lg:col-span-8 bg-[#111827] border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+            <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+              <span>🛒 Place a New SMM Order</span>
+            </h2>
+            <span class="text-xs font-mono text-cyan-400">INSTANT API AUTOMATION</span>
+          </div>
+
+          <!-- Platform Selector Pills -->
+          <div>
+            <label class="block text-sm font-bold text-gray-300 mb-2.5">Select Social Network</label>
+            <div class="flex flex-wrap gap-2" id="dash-platform-pills">
+              <button type="button" class="dash-platform-pill active px-4 py-2 rounded-xl bg-cyan-500 text-black font-bold text-xs" data-platform="instagram">📸 Instagram</button>
+              <button type="button" class="dash-platform-pill px-4 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-medium" data-platform="tiktok">🎵 TikTok</button>
+              <button type="button" class="dash-platform-pill px-4 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-medium" data-platform="youtube">▶️ YouTube</button>
+              <button type="button" class="dash-platform-pill px-4 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-medium" data-platform="telegram">✈️ Telegram</button>
+              <button type="button" class="dash-platform-pill px-4 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-medium" data-platform="twitter">✖️ X (Twitter)</button>
+              <button type="button" class="dash-platform-pill px-4 py-2 rounded-xl bg-gray-800 text-gray-300 text-xs font-medium" data-platform="facebook">💬 Facebook & WA</button>
+            </div>
+          </div>
+
+          <!-- Service Dropdown -->
+          <div>
+            <label class="block text-sm font-bold text-gray-300 mb-2">Select Service</label>
+            <select id="dash-service-select" class="w-full bg-[#0b101b] border border-gray-700 text-white font-medium rounded-xl p-4 focus:outline-none focus:border-cyan-400">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <!-- Target URL -->
+          <div>
+            <label class="block text-sm font-bold text-gray-300 mb-2">Target Link <span class="text-xs text-gray-400 font-normal">(Profile, video, or channel URL)</span></label>
+            <input type="url" id="dash-link-input" placeholder="https://..." class="w-full bg-[#0b101b] border border-gray-700 text-white rounded-xl p-4 font-mono text-sm focus:outline-none focus:border-cyan-400">
+          </div>
+
+          <!-- Quantity -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-300 mb-2">Quantity</label>
+              <input type="number" id="dash-qty-input" min="100" max="50000" value="2500" class="w-full bg-[#0b101b] border border-gray-700 text-white font-mono font-bold text-lg rounded-xl p-4 focus:outline-none focus:border-cyan-400">
+              <div class="flex justify-between text-xs text-gray-400 mt-1 font-mono">
+                <span id="dash-min-txt">Min: 100</span>
+                <span id="dash-max-txt">Max: 50,000</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-gray-300 mb-2">Order Total</label>
+              <div class="bg-[#0b101b] border border-cyan-500/30 rounded-xl p-4 flex items-center justify-between">
+                <span id="dash-price-display" class="font-mono font-extrabold text-cyan-400 text-2xl">KSh 325.00</span>
+                <span class="badge-instant">INSTANT</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Order -->
+          <div class="pt-4 border-t border-gray-800 flex items-center justify-between">
+            <span class="text-xs text-gray-400 font-mono">⚡ Guaranteed 30-Day Refill & Zero Drop</span>
+            <button id="btn-dash-submit-order" class="bg-gradient-to-r from-cyan-400 via-cyan-300 to-green-400 text-black font-extrabold px-8 py-4 rounded-xl shadow-lg shadow-cyan-500/25 hover:scale-105 transition-all">
+              🚀 Submit Order Instantly
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Service Description Card (4 cols) -->
+        <div class="lg:col-span-4 space-y-6">
+          <div class="bg-[#111827] border border-gray-800 rounded-2xl p-6 space-y-4">
+            <h3 class="font-bold text-white text-lg border-b border-gray-800 pb-3">Service Details</h3>
+            
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between py-2 border-b border-gray-800/60">
+                <span class="text-gray-400">Speed:</span>
+                <span id="dash-srv-speed" class="font-semibold text-white">10K/Day</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-800/60">
+                <span class="text-gray-400">Start Time:</span>
+                <span class="font-semibold text-green-400">Instant (0-15 Min)</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-800/60">
+                <span class="text-gray-400">Refill Warranty:</span>
+                <span class="font-semibold text-yellow-400">30 Days Automated</span>
+              </div>
+              <div class="py-2">
+                <span class="text-gray-400 block mb-1">Description:</span>
+                <p id="dash-srv-desc" class="text-xs text-gray-300 leading-relaxed bg-[#0b101b] p-3 rounded-lg border border-gray-800">
+                  High quality real-looking followers with profile pictures & bio.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-green-500/10 to-emerald-500/5 border border-green-500/30 rounded-2xl p-6 space-y-3">
+            <h4 class="font-bold text-white text-base flex items-center gap-2">
+              <span>📲 Automated M-Pesa Billing</span>
+            </h4>
+            <p class="text-xs text-gray-300 leading-relaxed">
+              When you submit an order, the amount is deducted instantly from your DenzGains wallet balance. Need to add funds? Top up with M-Pesa STK Push in 10 seconds.
+            </p>
+            <button onclick="switchDashTab('tab-deposit')" class="text-green-400 font-bold text-xs underline block pt-1">
+              + Top Up Account Balance Now &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: ORDERS & HISTORY -->
+    <div id="tab-orders" class="dash-tab-content hidden">
+      <div class="bg-[#111827] border border-gray-800 rounded-2xl p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-6 mb-6">
+          <div>
+            <h2 class="text-xl font-extrabold text-white">Your Order History & Status</h2>
+            <p class="text-gray-400 text-sm">Real-time status tracking for all your social media promotion campaigns.</p>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button class="bg-cyan-500 text-black font-bold px-3 py-1.5 rounded-lg text-xs font-mono">All Orders</button>
+            <button class="bg-gray-800 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-mono">In Progress (1)</button>
+            <button class="bg-gray-800 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-mono">Completed (41)</button>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse min-w-[750px]">
+            <thead>
+              <tr class="bg-gray-900 text-gray-400 font-mono text-xs uppercase border-b border-gray-800">
+                <th class="py-3 px-4">Order ID</th>
+                <th class="py-3 px-4">Service</th>
+                <th class="py-3 px-4">Link</th>
+                <th class="py-3 px-4">Quantity</th>
+                <th class="py-3 px-4">Start / Rem.</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-right">Refill / Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800 text-sm" id="dash-orders-tbody">
+              <!-- Order 1: Active -->
+              <tr class="hover:bg-gray-800/40">
+                <td class="py-4 px-4 font-mono font-bold text-cyan-400">#DG-849201</td>
+                <td class="py-4 px-4 font-medium text-white">Instagram Real Kenyan Followers</td>
+                <td class="py-4 px-4 font-mono text-xs text-gray-400 truncate max-w-[150px]">instagram.com/nairobi_creators</td>
+                <td class="py-4 px-4 font-mono font-bold">5,000</td>
+                <td class="py-4 px-4 font-mono text-xs text-gray-300">Start: 12,400 <br> Rem: 1,150</td>
+                <td class="py-4 px-4">
+                  <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 px-2.5 py-1 rounded-full text-xs font-bold font-mono">
+                    IN PROGRESS (77%)
+                  </span>
+                </td>
+                <td class="py-4 px-4 text-right">
+                  <span class="text-xs text-gray-500 font-mono">Running...</span>
+                </td>
+              </tr>
+
+              <!-- Order 2: Completed -->
+              <tr class="hover:bg-gray-800/40">
+                <td class="py-4 px-4 font-mono font-bold text-gray-300">#DG-810294</td>
+                <td class="py-4 px-4 font-medium text-white">TikTok Real Followers [Low Drop]</td>
+                <td class="py-4 px-4 font-mono text-xs text-gray-400 truncate max-w-[150px]">tiktok.com/@sarahm_ke</td>
+                <td class="py-4 px-4 font-mono font-bold">10,000</td>
+                <td class="py-4 px-4 font-mono text-xs text-gray-300">Start: 450 <br> Rem: 0</td>
+                <td class="py-4 px-4">
+                  <span class="bg-green-500/20 text-green-400 border border-green-500/40 px-2.5 py-1 rounded-full text-xs font-bold font-mono">
+                    COMPLETED
+                  </span>
+                </td>
+                <td class="py-4 px-4 text-right">
+                  <button class="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/40 px-3 py-1 rounded-lg text-xs font-bold font-mono transition-colors" onclick="alert('⚡ Refill request submitted! Our automated monitor is now checking count.')">
+                    🔄 Free Refill
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Order 3: Completed -->
+              <tr class="hover:bg-gray-800/40">
+                <td class="py-4 px-4 font-mono font-bold text-gray-300">#DG-792841</td>
+                <td class="py-4 px-4 font-medium text-white">YouTube 4,000 Watch Hours Package</td>
+                <td class="py-4 px-4 font-mono text-xs text-gray-400 truncate max-w-[150px]">youtube.com/watch?v=ke92</td>
+                <td class="py-4 px-4 font-mono font-bold">1,000</td>
+                <td class="py-4 px-4 font-mono text-xs text-gray-300">Start: 120 <br> Rem: 0</td>
+                <td class="py-4 px-4">
+                  <span class="bg-green-500/20 text-green-400 border border-green-500/40 px-2.5 py-1 rounded-full text-xs font-bold font-mono">
+                    COMPLETED
+                  </span>
+                </td>
+                <td class="py-4 px-4 text-right">
+                  <span class="text-xs text-green-400 font-mono">✓ Verified</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: DEPOSIT / ADD FUNDS VIA M-PESA -->
+    <div id="tab-deposit" class="dash-tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Deposit form (7 cols) -->
+        <div class="lg:col-span-7 bg-[#111827] border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div class="border-b border-gray-800 pb-4">
+            <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+              <span>📲 Add Funds via M-Pesa / Airtel Money</span>
+            </h2>
+            <p class="text-xs text-gray-400 mt-1">Instant STK Push or manual Paybill top-up for your DenzGains balance.</p>
+          </div>
+
+          <!-- Payment method pills -->
+          <div class="grid grid-cols-3 gap-3">
+            <div class="bg-green-950/40 border-2 border-green-500 p-4 rounded-xl text-center cursor-pointer">
+              <span class="text-xl block mb-1">📲</span>
+              <span class="text-xs font-bold text-green-400 block">M-Pesa STK Push</span>
+              <span class="text-[10px] text-gray-400">Instant Automated</span>
+            </div>
+            <div class="bg-gray-800/60 border border-gray-700 p-4 rounded-xl text-center cursor-pointer hover:border-gray-500">
+              <span class="text-xl block mb-1">💳</span>
+              <span class="text-xs font-bold text-white block">Card / Visa / MC</span>
+              <span class="text-[10px] text-gray-400">Global Payments</span>
+            </div>
+            <div class="bg-gray-800/60 border border-gray-700 p-4 rounded-xl text-center cursor-pointer hover:border-gray-500">
+              <span class="text-xl block mb-1">🪙</span>
+              <span class="text-xs font-bold text-white block">Crypto (USDT / BTC)</span>
+              <span class="text-[10px] text-gray-400">+5% Bonus</span>
+            </div>
+          </div>
+
+          <!-- Top-up Form -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-300 mb-2">Enter Amount to Deposit (KSh)</label>
+              <div class="grid grid-cols-4 gap-2 mb-3">
+                <button type="button" class="btn-preset-amt bg-gray-800 hover:bg-gray-700 text-white font-mono text-sm py-2 rounded-lg font-bold" data-amt="500">+ KSh 500</button>
+                <button type="button" class="btn-preset-amt bg-gray-800 hover:bg-gray-700 text-white font-mono text-sm py-2 rounded-lg font-bold" data-amt="1000">+ KSh 1,000</button>
+                <button type="button" class="btn-preset-amt bg-gray-800 hover:bg-gray-700 text-white font-mono text-sm py-2 rounded-lg font-bold" data-amt="2500">+ KSh 2,500</button>
+                <button type="button" class="btn-preset-amt bg-gray-800 hover:bg-gray-700 text-white font-mono text-sm py-2 rounded-lg font-bold" data-amt="5000">+ KSh 5,000</button>
+              </div>
+              <input type="number" id="deposit-amount" min="100" value="1000" class="w-full bg-[#0b101b] border border-gray-700 text-white font-mono font-bold text-xl rounded-xl p-4 focus:outline-none focus:border-green-400">
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-gray-300 mb-2">Your M-Pesa Phone Number</label>
+              <input type="text" id="deposit-phone" placeholder="07XX XXX XXX or 01XX XXX XXX" class="w-full bg-[#0b101b] border border-gray-700 text-white font-mono rounded-xl p-4 text-sm focus:outline-none focus:border-green-400" value="0796433670">
+            </div>
+
+            <div id="deposit-sim-status" class="hidden p-4 bg-gray-800/80 border border-green-500/40 rounded-xl text-center space-y-1">
+              <p id="deposit-status-txt" class="text-sm font-semibold text-green-400">📲 Sending STK Push to phone...</p>
+            </div>
+
+            <button type="button" id="btn-submit-deposit" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-extrabold py-4 px-6 rounded-xl shadow-lg shadow-green-500/25 transition-all text-base">
+              📲 Send M-Pesa STK Push Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Manual Paybill Info (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="bg-[#141c2e] border border-gray-800 rounded-2xl p-6 space-y-4 font-mono text-sm">
+            <span class="text-xs text-gray-400 uppercase">OR MANUAL M-PESA PAYBILL</span>
+            <h3 class="font-bold text-white text-lg font-sans">M-Pesa Paybill Instructions</h3>
+            
+            <div class="space-y-3 bg-[#0a0e17] p-4 rounded-xl border border-gray-800">
+              <div class="flex justify-between">
+                <span class="text-gray-400">Business Number:</span>
+                <span class="text-cyan-400 font-bold">400200</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Account Number:</span>
+                <span class="text-green-400 font-bold">DENZGAINS</span>
+              </div>
+            </div>
+
+            <ol class="space-y-2 text-xs text-gray-300 list-decimal list-inside font-sans">
+              <li>Go to M-Pesa on your Safaricom menu.</li>
+              <li>Select <strong>Lipa na M-Pesa</strong> &rarr; <strong>Paybill</strong>.</li>
+              <li>Enter Business No: <strong>400200</strong></li>
+              <li>Enter Account No: <strong>DENZGAINS</strong></li>
+              <li>Enter the amount you wish to deposit.</li>
+              <li>Enter your PIN and press Send.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: 12% AFFILIATE PROGRAM -->
+    <div id="tab-affiliate" class="dash-tab-content hidden">
+      <div class="bg-[#111827] border border-yellow-500/30 rounded-2xl p-6 sm:p-8 space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-6">
+          <div>
+            <span class="bg-yellow-500/20 text-yellow-400 text-xs font-mono font-bold px-3 py-1 rounded-full uppercase">
+              🎉 12% LIFETIME COMMISSION
+            </span>
+            <h2 class="text-2xl font-extrabold text-white mt-2">Your Affiliate Dashboard & Referral Links</h2>
+          </div>
+
+          <div class="flex items-center gap-4 bg-[#0a0e17] border border-gray-800 p-4 rounded-xl">
+            <div>
+              <span class="text-xs text-gray-400 block font-mono">AVAILABLE EARNINGS:</span>
+              <span id="aff-balance" class="text-xl font-extrabold text-yellow-400 font-mono">KSh 3,840.00</span>
+            </div>
+            <button class="bg-yellow-400 hover:bg-yellow-300 text-black font-extrabold px-4 py-2 rounded-lg text-xs font-mono" onclick="alert('📲 Withdrawal of KSh 3,840.00 to your M-Pesa has been initiated!')">
+              Withdraw to M-Pesa
+            </button>
+          </div>
+        </div>
+
+        <!-- Unique referral link box -->
+        <div>
+          <label class="block text-sm font-bold text-gray-300 mb-2">Your Unique Referral Link</label>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" readonly value="https://denzgains.com/ref/vip_client_ke" id="aff-ref-link" class="flex-1 bg-[#0a0e17] border border-yellow-500/30 text-white font-mono p-4 rounded-xl text-sm">
+            <button class="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/40 font-bold px-6 py-4 rounded-xl text-sm font-mono whitespace-nowrap" onclick="copyRefLink()">
+              📋 Copy Referral Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Affiliate Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div class="bg-[#0a0e17] border border-gray-800 p-5 rounded-xl text-center">
+            <span class="text-xs text-gray-400 font-mono block">TOTAL CLICKS</span>
+            <span class="text-2xl font-bold text-white font-mono mt-1">428</span>
+          </div>
+          <div class="bg-[#0a0e17] border border-gray-800 p-5 rounded-xl text-center">
+            <span class="text-xs text-gray-400 font-mono block">INVITED FRIENDS</span>
+            <span class="text-2xl font-bold text-cyan-400 font-mono mt-1">19</span>
+          </div>
+          <div class="bg-[#0a0e17] border border-gray-800 p-5 rounded-xl text-center">
+            <span class="text-xs text-gray-400 font-mono block">COMMISSION RATE</span>
+            <span class="text-2xl font-bold text-yellow-400 font-mono mt-1">12% Lifetime</span>
+          </div>
+          <div class="bg-[#0a0e17] border border-gray-800 p-5 rounded-xl text-center">
+            <span class="text-xs text-gray-400 font-mono block">TOTAL EARNED</span>
+            <span class="text-2xl font-bold text-green-400 font-mono mt-1">KSh 18,420</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: RESELLER API -->
+    <div id="tab-api" class="dash-tab-content hidden">
+      <div class="bg-[#111827] border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6 font-mono text-sm">
+        <div class="border-b border-gray-800 pb-4">
+          <h2 class="text-xl font-extrabold text-white font-sans">🔌 Reseller API Documentation</h2>
+          <p class="text-xs text-gray-400 mt-1 font-sans">Connect your custom SMM Panel or website directly to DenzGains servers.</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">YOUR API KEY</label>
+            <div class="flex gap-2">
+              <input type="text" readonly value="dg_live_84291048f020a1b9c28e93000a12e" class="w-full bg-[#0a0e17] border border-gray-700 text-cyan-400 p-3 rounded-xl">
+              <button class="bg-gray-800 hover:bg-gray-700 px-4 rounded-xl text-white font-bold" onclick="alert('🔑 API Key copied!')">Copy</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">API ENDPOINT URL</label>
+            <input type="text" readonly value="https://denzgains.com/api/v2" class="w-full bg-[#0a0e17] border border-gray-700 text-white p-3 rounded-xl">
+          </div>
+
+          <!-- JSON Sample Request -->
+          <div class="bg-[#0a0e17] border border-gray-800 p-4 rounded-xl space-y-2">
+            <span class="text-xs text-gray-400 block">EXAMPLE CODE (POST /api/v2/order):</span>
+            <pre class="text-xs text-green-400 overflow-x-auto">{
+  "key": "dg_live_84291048f020a1b9c28e93000a12e",
+  "action": "add",
+  "service": 102,
+  "link": "https://instagram.com/nairobi_creators",
+  "quantity": 5000
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Script for Dashboard navigation & interactive order form -->
+  <script src="services-data.js"></script>
+  <script>
+    let currentDashPlatform = 'instagram';
+    let currentDashService = null;
+    let balanceKSh = 2450.00;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initDashboardTabs();
+      initDashboardOrderForm();
+      initDepositSimulator();
+    });
+
+    function initDashboardTabs() {
+      const tabButtons = document.querySelectorAll('.dash-tab-btn');
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-target');
+          switchDashTab(target);
+        });
+      });
+    }
+
+    function switchDashTab(targetId) {
+      document.querySelectorAll('.dash-tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-target') === targetId) {
+          btn.classList.remove('text-gray-300');
+          btn.classList.add('bg-cyan-500', 'text-black', 'font-bold');
+        } else {
+          btn.classList.remove('bg-cyan-500', 'text-black', 'font-bold');
+          btn.classList.add('text-gray-300');
+        }
+      });
+
+      document.querySelectorAll('.dash-tab-content').forEach(content => {
+        if (content.id === targetId) {
+          content.classList.remove('hidden');
+        } else {
+          content.classList.add('hidden');
+        }
+      });
+    }
+
+    function initDashboardOrderForm() {
+      const pills = document.querySelectorAll('.dash-platform-pill');
+      const select = document.getElementById('dash-service-select');
+      const qtyInput = document.getElementById('dash-qty-input');
+      const submitBtn = document.getElementById('btn-dash-submit-order');
+
+      pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          pills.forEach(p => {
+            p.classList.remove('bg-cyan-500', 'text-black', 'font-bold');
+            p.classList.add('bg-gray-800', 'text-gray-300');
+          });
+          pill.classList.remove('bg-gray-800', 'text-gray-300');
+          pill.classList.add('bg-cyan-500', 'text-black', 'font-bold');
+
+          currentDashPlatform = pill.getAttribute('data-platform');
+          populateDashServices(currentDashPlatform);
+        });
+      });
+
+      function populateDashServices(platform) {
+        const list = SERVICES_DATA.filter(s => s.platform === platform);
+        select.innerHTML = '';
+        list.forEach((s, idx) => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `${s.name} — KSh ${(s.priceUSD * 130).toFixed(2)} / 1K`;
+          select.appendChild(opt);
+          if (idx === 0) currentDashService = s;
+        });
+        updateDashDisplay();
+      }
+
+      select.addEventListener('change', () => {
+        const id = parseInt(select.value);
+        currentDashService = SERVICES_DATA.find(s => s.id === id);
+        updateDashDisplay();
+      });
+
+      qtyInput.addEventListener('input', updateDashDisplay);
+
+      function updateDashDisplay() {
+        if (!currentDashService) return;
+        const qty = parseInt(qtyInput.value) || currentDashService.min;
+        const priceKES = (qty / 1000) * (currentDashService.priceUSD * 130);
+
+        document.getElementById('dash-price-display').textContent = `KSh ${priceKES.toLocaleString('en-KE', {minimumFractionDigits: 2})}`;
+        document.getElementById('dash-min-txt').textContent = `Min: ${currentDashService.min.toLocaleString()}`;
+        document.getElementById('dash-max-txt').textContent = `Max: ${currentDashService.max.toLocaleString()}`;
+        document.getElementById('dash-srv-speed').textContent = currentDashService.speed;
+        document.getElementById('dash-srv-desc').textContent = currentDashService.description;
+      }
+
+      populateDashServices('instagram');
+
+      submitBtn.addEventListener('click', () => {
+        const link = document.getElementById('dash-link-input').value.trim();
+        const qty = parseInt(qtyInput.value) || 1000;
+        const costKES = (qty / 1000) * (currentDashService.priceUSD * 130);
+
+        if (!link) {
+          alert('⚠️ Please enter the target profile or post link!');
+          return;
+        }
+
+        if (costKES > balanceKSh) {
+          alert('⚠️ Insufficient account balance! Please click "Add Funds [M-Pesa]" to top up.');
+          switchDashTab('tab-deposit');
+          return;
+        }
+
+        balanceKSh -= costKES;
+        document.getElementById('dash-balance-display').textContent = `KSh ${balanceKSh.toLocaleString('en-KE', {minimumFractionDigits: 2})}`;
+        
+        // Add to orders history table
+        const tbody = document.getElementById('dash-orders-tbody');
+        const randId = Math.floor(100000 + Math.random() * 900000);
+        const newRow = document.createElement('tr');
+        newRow.className = 'hover:bg-gray-800/40 border-b border-gray-800 animate-pulse';
+        newRow.innerHTML = `
+          <td class="py-4 px-4 font-mono font-bold text-cyan-400">#DG-${randId}</td>
+          <td class="py-4 px-4 font-medium text-white">${currentDashService.name}</td>
+          <td class="py-4 px-4 font-mono text-xs text-gray-400 truncate max-w-[150px]">${link}</td>
+          <td class="py-4 px-4 font-mono font-bold">${qty.toLocaleString()}</td>
+          <td class="py-4 px-4 font-mono text-xs text-gray-300">Start: 0 <br> Rem: ${qty.toLocaleString()}</td>
+          <td class="py-4 px-4">
+            <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 px-2.5 py-1 rounded-full text-xs font-bold font-mono">
+              IN PROGRESS (0%)
+            </span>
+          </td>
+          <td class="py-4 px-4 text-right">
+            <span class="text-xs text-green-400 font-mono">⚡ Started</span>
+          </td>
+        `;
+        tbody.insertBefore(newRow, tbody.firstChild);
+
+        alert(`🎉 Order #DG-${randId} submitted successfully! Your new balance is KSh ${balanceKSh.toLocaleString('en-KE', {minimumFractionDigits: 2})}`);
+        switchDashTab('tab-orders');
+      });
+    }
+
+    function initDepositSimulator() {
+      const presetBtns = document.querySelectorAll('.btn-preset-amt');
+      const amtInput = document.getElementById('deposit-amount');
+      const submitBtn = document.getElementById('btn-submit-deposit');
+      const statusBox = document.getElementById('deposit-sim-status');
+      const statusTxt = document.getElementById('deposit-status-txt');
+
+      presetBtns.forEach(b => {
+        b.addEventListener('click', () => {
+          amtInput.value = b.getAttribute('data-amt');
+        });
+      });
+
+      submitBtn.addEventListener('click', () => {
+        const amt = parseFloat(amtInput.value) || 0;
+        const phone = document.getElementById('deposit-phone').value.trim();
+
+        if (amt < 50) {
+          alert('⚠️ Minimum deposit is KSh 50');
+          return;
+        }
+        if (!phone || phone.length < 9) {
+          alert('⚠️ Enter a valid mobile number');
+          return;
+        }
+
+        statusBox.classList.remove('hidden');
+        statusTxt.textContent = `📲 STK Push sent to ${phone}! Enter your PIN to confirm KSh ${amt.toLocaleString()} deposit...`;
+
+        setTimeout(() => {
+          balanceKSh += amt;
+          document.getElementById('dash-balance-display').textContent = `KSh ${balanceKSh.toLocaleString('en-KE', {minimumFractionDigits: 2})}`;
+          statusBox.innerHTML = `
+            <div class="text-green-400 font-bold">
+              ✓ KSh ${amt.toLocaleString()} added successfully via M-Pesa STK Push!
+            </div>
+          `;
+          alert(`🎉 Top up successful! Your balance is now KSh ${balanceKSh.toLocaleString('en-KE', {minimumFractionDigits: 2})}`);
+        }, 2200);
+      });
+    }
+
+    function copyRefLink() {
+      const link = document.getElementById('aff-ref-link');
+      link.select();
+      document.execCommand('copy');
+      alert('📋 Unique Affiliate Link copied to clipboard!');
+    }
+  </script>
+</body>
+</html>

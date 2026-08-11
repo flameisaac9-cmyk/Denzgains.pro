@@ -1,0 +1,117 @@
+// DenzGains Pro - Services & Pricing Data (Supports KES and USD)
+const EXCHANGE_RATES = {
+  KES: { symbol: 'KSh ', rate: 130 },
+  USD: { symbol: '$', rate: 1 },
+  EUR: { symbol: '€', rate: 0.92 }
+};
+
+const SERVICES_DATA = [
+  // INSTAGRAM SERVICES
+  {
+    id: 101,
+    platform: 'instagram',
+    platformName: 'Instagram',
+    category: 'Followers - Guaranteed & Refill',
+    name: 'Instagram Real & Active Followers [30 Days Refill | Instant Start]',
+    priceUSD: 0.65, // per 1000
+    min: 100,
+    max: 50000,
+    speed: '10K/Day',
+    description: 'High quality real-looking followers with profile pictures & bio. Guaranteed 30 days refill button.',
+    popular: true,
+    kenyanFavorite: false
+  },
+  {
+    id: 102,
+    platform: 'instagram',
+    platformName: 'Instagram',
+    category: 'Followers - Kenya & African Targeted',
+    name: 'Instagram Kenyan Targeted Real Followers [High Authority | Instant]',
+    priceUSD: 3.20,
+    min: 50,
+    max: 10000,
+    speed: '2K/Day',
+    description: 'Authentic followers from Kenya and East Africa. Perfect for local brands and influencers.',
+    popular: true,
+    kenyanFavorite: true
+  },
+  {
+    id: 103,
+    platform: 'instagram',
+    platformName: 'Instagram',
+    category: 'Likes - Instant & Viral',
+    name: 'Instagram Real Likes [Instant Delivery | Impressions + Reach]',
+    priceUSD: 0.12,
+    min: 50,
+    max: 100000,
+    speed: 'Instant',
+    description: 'Super fast likes that help boost your post onto the Explore page.',
+    popular: false,
+    kenyanFavorite: false
+  },
+  {
+    id: 104,
+    platform: 'instagram',
+    platformName: 'Instagram',
+    category: 'Views - Reels & Video',
+    name: 'Instagram Reels Viral Views + Shares [Ultra Fast]',
+    priceUSD: 0.05,
+    min: 500,
+    max: 1000000,
+    speed: '100K/Hour',
+    description: 'Instant Reels views to trigger algorithm promotion.',
+    popular: true,
+    kenyanFavorite: false
+  },
+
+  // TIKTOK SERVICES
+  {
+    id: 201,
+    platform: 'tiktok',
+    platformName: 'TikTok',
+    category: 'Followers - High Quality',
+    name: 'TikTok Real Followers [Instant | Low Drop | For You Page Boost]',
+    priceUSD: 1.40,
+    min: 100,
+    max: 25000,
+    speed: '5K/Day',
+    description: 'High retention followers to unlock Live streaming (1k+ followers).',
+    popular: true,
+    kenyanFavorite: true
+  },
+  {
+    id: 202,
+    platform: 'tiktok',
+    platformName: 'TikTok',
+    category: 'Views - Video & Live',
+    name: 'TikTok Video Viral Views [Cheapest Globally | Instant]',
+    priceUSD: 0.01,
+    min: 1000,
+    max: 5000000,
+    speed: '500K/Day',
+    description: 'The cheapest viral TikTok views on the market. Starts in seconds.',
+    popular: true,
+    kenyanFavorite: false
+  },
+  {
+    id: 203,
+    platform: 'tiktok',
+    platformName: 'TikTok',
+    category: 'Likes - High Retention',
+    name: 'TikTok Real Kenyan & African Likes [Instant Start]',
+    priceUSD: 0.45,
+    min: 100,
+    max: 50000,
+    speed: '20K/Day',
+    description: 'Organic likes from active accounts. Great for engagement rate.',
+    popular: false,
+    kenyanFavorite: true
+  },
+  {
+    id: 204,
+    platform: 'tiktok',
+    platformName: 'TikTok',
+    category: 'Shares & Saves',
+    name: 'TikTok Video Saves & Shares [Algorithm Booster]',
+    priceUSD: 0.08,
+    min: 100,

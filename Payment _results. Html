@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>DenzGains Pro - Payment Result</title>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+    }
+
+    .card {
+      width: min(90%, 520px);
+      background: white;
+      padding: 35px;
+      border-radius: 18px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.08);
+      text-align: center;
+    }
+
+    .status {
+      font-size: 22px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .details {
+      text-align: left;
+      margin-top: 25px;
+      line-height: 1.8;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 13px 22px;
+      border-radius: 10px;
+      text-decoration: none;
+      background: #111827;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <h1>DenzGains Pro</h1>
+
+    <div
+      id="status"
+      class="status"
+    >
+      Checking payment...
+    </div>
+
+    <div
+      id="details"
+      class="details"
+    ></div>
+
+    <a
+      href="/"
+      class="btn"
+    >
+      Return to DenzGains Pro
+    </a>
+
+  </div>
+
+
+<script>
+
+const API_URL =
+  "https://YOUR-WORKER.workers.dev";
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const reference =
+  params.get("reference");
+
+const trackingId =
+  params.get(
+    "orderTrackingId"
+  );
+
+const statusElement =
+  document.getElementById(
+    "status"
+  );
+
+const detailsElement =
+  document.getElementById(
+    "details"
+  );
+
+
+async function checkPayment() {
+
+  if (!reference &&
+      !trackingId) {
+
+    statusElement.textContent =
+      "Payment reference missing.";
+
+    return;
+  }
+
+  try {
+
+    const query =
+      reference
+        ? `reference=${encodeURIComponent(reference)}`
+        : `orderTrackingId=${encodeURIComponent(trackingId)}`;
+
+    const response =
+      await fetch(
+        `${API_URL}/api/payment/status?${query}`
+      );
+
+    const result =
+      await response.json();
+
+    if (!result.success) {
+      throw new Error(
+        result.error ||
+        "Unable to check payment."
+      );
+    }
+
+    const order =
+      result.order;
+
+    const payment =
+      result.payment;
+
+    const status =
+      order?.status ||
+      payment?.payment_status_description ||
+      payment?.payment_status ||
+      "PENDING";
+
+    statusElement.textContent =
+      getStatusText(status);
+
+    detailsElement.innerHTML = `
+      <p>
+        <strong>Reference:</strong>
+        ${escapeHtml(
+          order?.merchant_reference ||
+          reference ||
+          ""
+        )}
+      </p>
+
+      ${
+        order
+          ? `
+            <p>
+              <strong>Service:</strong>
+              ${escapeHtml(
+                order.service_name
+              )}
+            </p>
+
+            <p>
+              <strong>Quantity:</strong>
+              ${Number(
+                order.quantity
+              ).toLocaleString()}
+            </p>
+
+            <p>
+              <strong>Amount:</strong>
+              KES ${Number(
+                order.amount
+              ).toFixed(2)}
+            </p>
+          `
+          : ""
+      }
+
+      <p>
+        <strong>Status:</strong>
+        ${escapeHtml(status)}
+      </p>
+    `;
+
+  } catch (error) {
+
+    statusElement.textContent =
+      "Unable to verify payment.";
+
+    detailsElement.textContent =
+      error.message;
+  }
+}
+
+
+function getStatusText(status) {
+
+  const value =
+    String(status)
+      .toUpperCase();
+
+  if (value === "PAID" ||
+      value === "COMPLETED") {
+
+    return "Payment successful ✓";
+  }
+
+  if (
+    value === "PAYMENT_FAILED" ||
+    value === "FAILED"
+  ) {
+
+    return "Payment failed";
+  }
+
+  if (value === "CANCELLED") {
+
+    return "Payment cancelled";
+  }
+
+  return "Payment is being verified...";
+}
+
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+}
+
+
+checkPayment();
+
+</script>
+
+</body>
+</html>
